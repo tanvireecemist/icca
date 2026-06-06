@@ -1,0 +1,69 @@
+project:
+  name: real-rf-dg
+  run_name: validation_all_sources
+  seed: 2026
+  output_dir: outputs
+
+data:
+  root: data/subset_all
+  acquisition_mode: subset
+  download_workers: 2
+  subset_fraction: 0.10
+  window_size: 2048
+  window_stride: 2048
+  min_windows_per_recording: 1
+  train_fraction: 0.70
+  val_fraction: 0.15
+  num_workers: 0
+  prefetch_factor: 2
+  pin_memory: false
+  persistent_workers: false
+  sources:
+    - wideft
+    - pla
+    - wlan
+
+model:
+  stem_width: 32
+  model_dim: 64
+  transformer_layers: 1
+  attention_heads: 4
+  embedding_dim: 64
+  dropout: 0.10
+  supcon_temperature: 0.10
+  supcon_weight: 0.05
+  domain_weight: 0.02
+
+trainer:
+  accelerator: cpu
+  devices: 1
+  precision: 32-true
+  max_epochs: 1
+  batch_size: 8
+  accumulate_grad_batches: 1
+  learning_rate: 0.001
+  weight_decay: 0.01
+  warmup_fraction: 0.0
+  gradient_clip_val: 1.0
+  benchmark: false
+  deterministic: true
+  compile: false
+  compile_mode: default
+  early_stopping_patience: 2
+  log_every_n_steps: 1
+  limit_train_batches: 2
+  limit_val_batches: 2
+  limit_test_batches: 2
+
+tuning:
+  start_batch_size: 4
+  max_batch_size: 16
+  memory_fraction: 0.90
+  safety_factor: 0.85
+  warmup_steps: 1
+  benchmark_steps: 2
+
+logger:
+  wandb: false
+  save_predictions: true
+  gpu_telemetry_seconds: 5

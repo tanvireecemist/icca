@@ -1,0 +1,66 @@
+project:
+  name: real-rf-dg
+  run_name: dctft_real_rf_10pct
+  seed: 2026
+  output_dir: outputs
+
+data:
+  root: data
+  acquisition_mode: subset
+  download_workers: 2
+  subset_fraction: 0.10
+  window_size: 4096
+  window_stride: 4096
+  min_windows_per_recording: 1
+  train_fraction: 0.70
+  val_fraction: 0.15
+  num_workers: 12
+  prefetch_factor: 4
+  pin_memory: true
+  persistent_workers: true
+  sources:
+    - wideft
+    - pla
+    - wlan
+
+model:
+  stem_width: 96
+  model_dim: 256
+  transformer_layers: 4
+  attention_heads: 8
+  embedding_dim: 256
+  dropout: 0.15
+  supcon_temperature: 0.10
+  supcon_weight: 0.10
+  domain_weight: 0.05
+
+trainer:
+  accelerator: gpu
+  devices: 1
+  precision: bf16-mixed
+  max_epochs: 80
+  batch_size: 512
+  accumulate_grad_batches: 1
+  learning_rate: 0.0008
+  weight_decay: 0.01
+  warmup_fraction: 0.08
+  gradient_clip_val: 1.0
+  benchmark: true
+  deterministic: false
+  compile: true
+  compile_mode: reduce-overhead
+  early_stopping_patience: 12
+  log_every_n_steps: 10
+
+tuning:
+  start_batch_size: 128
+  max_batch_size: 4096
+  memory_fraction: 0.90
+  safety_factor: 0.85
+  warmup_steps: 8
+  benchmark_steps: 30
+
+logger:
+  wandb: false
+  save_predictions: true
+  gpu_telemetry_seconds: 5
